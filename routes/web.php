@@ -110,3 +110,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/process', [CheckoutController::class,'process'])->name('checkout.process');
     Route::get('/checkout/success',  [CheckoutController::class,'success'])->name('checkout.success');
 });
+
+use App\Http\Controllers\AdminController;
+
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+
+    Route::get('/admin/products', [AdminController::class, 'products']);
+
+    Route::get('/admin/orders', [AdminController::class, 'orders']);
+
+    Route::get('/admin/reports', [AdminController::class, 'reports']);
+
+
+    use App\Http\Controllers\SuperAdminController;
+
+
+    Route::get('/superadmin/dashboard', [SuperAdminController::class, 'dashboard']);
+
+    Route::get('/superadmin/admins', [SuperAdminController::class, 'admins']);
+
+    Route::get('/superadmin/users', [SuperAdminController::class, 'users']);
+
+    Route::get('/superadmin/transactions', [SuperAdminController::class, 'transactions']);
+
+    Route::get('/superadmin/reports', [SuperAdminController::class, 'reports']);
+
+    Route::get('/superadmin/auditlog', [SuperAdminController::class, 'auditlog']);

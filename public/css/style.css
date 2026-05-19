@@ -953,3 +953,136 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+.admin-container{
+    display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:260px;
+    height:100vh;
+    background:#111827;
+    color:white;
+    position:fixed;
+    padding:20px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:40px;
+}
+
+.sidebar-menu{
+    list-style:none;
+}
+
+.sidebar-menu li{
+    margin:15px 0;
+}
+
+.sidebar-menu a{
+    color:white;
+    text-decoration:none;
+    display:block;
+    padding:12px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.sidebar-menu a:hover{
+    background:#2563eb;
+}
+
+/* CONTENT */
+
+.main-content{
+    margin-left:260px;
+    width:100%;
+    padding:30px;
+}
+
+.topbar{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card h2{
+    font-size:30px;
+    margin-top:10px;
+}
+
+/* TABLE */
+
+.table-container{
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    margin-top:30px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+table th,
+table td{
+    padding:15px;
+    text-align:left;
+    border-bottom:1px solid #ddd;
+}
+
+.btn{
+    padding:10px 16px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-add{
+    background:#2563eb;
+    color:white;
+}
+
+.btn-edit{
+    background:orange;
+    color:white;
+}
+
+.btn-delete{
+    background:red;
+    color:white;
+}

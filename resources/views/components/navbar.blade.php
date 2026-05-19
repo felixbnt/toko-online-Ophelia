@@ -29,4 +29,4 @@
     </div>
 </header>
 
-@include('components.cart')
+@include('components.cart')`
