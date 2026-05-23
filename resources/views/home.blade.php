@@ -3,53 +3,20 @@
 @section('content')
 
 <section class="hero">
-    <img src="{{ asset('images/banner.jpg') }}">
-    <div class="hero-text">
-        <h1>NEW COLLECTION</h1>
-        <p>SPRING / SUMMER 2024</p>
-        <button>SHOP NOW</button>
+    <img src="https://i1-c.pinimg.com/1200x/b2/c4/d2/b2c4d211cd0d46aab8c42c93e1ccecd5.jpg">    <div class="hero-text">
     </div>
 </section>
 
 <section class="category">
     <div class="card">
-        <img src="{{ asset('images/woman.jpg') }}">
-        <button>SHOP WOMAN</button>
+    <img src="{{ asset('images/woman.jpg') }}">
+    <a href="{{ route('woman') }}"><button>SHOP WOMAN</button></a>
     </div>
 
     <div class="card">
-        <img src="{{ asset('images/man.jpg') }}">
-        <button>SHOP MAN</button>
+    <img src="{{ asset('images/man.jpg') }}">
+    <a href="{{ route('man') }}"><button>SHOP MAN</button></a>
     </div>
-</section>
-
-<section class="products">
-    <h2>BEST SELLERS</h2>
-
-    <div class="grid">
-        <div class="item">
-            <img src="{{ asset('images/products/p1.jpg') }}">
-            <p>Tops</p>
-            <span>Rp 799.000</span>
-        </div>
-
-        <div class="item">
-            <img src="{{ asset('images/products/p2.jpg') }}">
-            <p>Dresses</p>
-            <span>Rp 599.000</span>
-        </div>
-
-        <div class="item">
-            <img src="{{ asset('images/products/p3.jpg') }}">
-            <p>Jeans</p>
-            <span>Rp 599.000</span>
-        </div>
-    </div>
-</section>
-
-<section class="trend">
-    <h2>STYLE & TRENDS</h2>
-    <button>READ MORE</button>
 </section>
 
 @endsection

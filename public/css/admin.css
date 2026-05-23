@@ -51,6 +51,10 @@ body{
     background:#2563eb;
 }
 
+.sidebar-menu a.active {
+    background: #2563eb;
+}
+
 /* CONTENT */
 
 .main-content{

@@ -1,20 +1,58 @@
+<style>
+    nav a {
+        position: relative;
+        text-decoration: none;
+        color: #000;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        transition: color 0.2s ease;
+        padding-bottom: 4px;
+    }
+
+    nav a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0%;
+        height: 1.5px;
+        background-color: #000;
+        transition: width 0.3s ease;
+    }
+
+    nav a:hover::after {
+        width: 100%;
+    }
+
+    nav a.nav-active {
+        font-weight: 700;
+    }
+
+    nav a.nav-active::after {
+        width: 100%;
+    }
+</style>
+
 <header class="navbar">
     <div class="logo">
         <a href="{{ route('home') }}" style="text-decoration:none; color:black;">OPHELIA</a>
     </div>
 
     <nav>
-        <a href="{{ route('home') }}">BERANDA</a>
-        <a href="{{ route('woman') }}">WOMAN</a>
-        <a href="{{ route('man') }}">MAN</a>
-        <a href="{{ route('kids') }}">KIDS</a>
-        <a href="{{ route('about') }}">ABOUT</a>
+        <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'nav-active' : '' }}">BERANDA</a>
+        <a href="{{ route('woman') }}" class="{{ request()->routeIs('woman') ? 'nav-active' : '' }}">WOMAN</a>
+        <a href="{{ route('man') }}" class="{{ request()->routeIs('man') ? 'nav-active' : '' }}">MAN</a>
+        <a href="{{ route('kids') }}" class="{{ request()->routeIs('kids') ? 'nav-active' : '' }}">KIDS</a>
+        <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'nav-active' : '' }}">ABOUT</a>
     </nav>
 
     <div class="right-menu">
-        <form action="{{ route('search') }}" method="GET" style="display:flex; align-items:center;">
-            <input type="text" name="q" placeholder="Search products..." value="{{ request('q') }}">
-            <button type="submit" style="border:1px solid #ccc; border-left:none; padding:5px 10px; background:white; cursor:pointer;">🔍</button>
+        <form action="{{ route('search') }}" method="GET" class="search-form">
+            <div class="search-wrapper">
+                <span class="search-icon"></span>
+                <input type="text" name="q" placeholder="Search products..." value="{{ request('q') }}" class="search-input">
+                <button type="submit" class="search-btn">Search</button>
+            </div>
         </form>
 
         @auth
@@ -29,4 +67,4 @@
     </div>
 </header>
 
-@include('components.cart')`
+@include('components.cart')

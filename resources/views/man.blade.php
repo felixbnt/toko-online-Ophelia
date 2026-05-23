@@ -33,8 +33,8 @@
                         <input type="hidden" name="name"             value="{{ $product['name'] }}">
                         <input type="hidden" name="price"            value="{{ $product['price'] }}">
                         <input type="hidden" name="img"              value="{{ $product['img'] }}">
-                        <input type="hidden" name="color"            value="{{ $product['colors'][0] }}">
-                        <input type="hidden" name="size"             value="{{ $product['sizes'][0] }}">
+                        <input type="hidden" name="color" value="{{ $product['colors'][0] ?? 'Default' }}">
+                        <input type="hidden" name="size" value="{{ $product['sizes'][0] ?? 'M' }}">
                         <input type="hidden" name="qty"              value="1">
                         <input type="hidden" name="redirect_to_cart" value="1">
                         <button type="submit" class="btn-cart" title="Tambah ke keranjang">

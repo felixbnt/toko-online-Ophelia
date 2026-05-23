@@ -1,51 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head>
+@extends('layouts.superadmin')
 
-    <title>Super Admin Dashboard</title>
+@section('title', 'Super Admin Dashboard')
 
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+@section('content')
 
-</head>
-<body>
-
-<div class="admin-container">
-
-    @include('components.superadmin-sidebar')
-
-    <div class="main-content">
-
-        <div class="topbar">
-            <h1>Super Admin Dashboard</h1>
-        </div>
-
-        <div class="cards">
-
-            <div class="card">
-                <p>Total Admin</p>
-                <h2>5</h2>
-            </div>
-
-            <div class="card">
-                <p>Total User</p>
-                <h2>240</h2>
-            </div>
-
-            <div class="card">
-                <p>Total Transaksi</p>
-                <h2>530</h2>
-            </div>
-
-            <div class="card">
-                <p>Total Pendapatan</p>
-                <h2>Rp 45JT</h2>
-            </div>
-
-        </div>
-
-    </div>
-
+<div class="topbar">
+    <h1>Dashboard — Ophelia SuperAdmin</h1>
+    <span style="font-size:.9rem; color:#666">{{ auth()->user()->name }}</span>
 </div>
 
-</body>
-</html>
+<div class="cards">
+    <div class="card">
+        <p>Total Admin</p>
+        <h2>{{ \App\Models\User::where('role','admin')->count() }}</h2>
+        <small style="color:#2563eb">↑ Aktif</small>
+    </div>
+    <div class="card">
+        <p>Total User</p>
+        <h2>{{ \App\Models\User::where('role','user')->count() }}</h2>
+        <small style="color:#2563eb">↑ Terdaftar</small>
+    </div>
+    <div class="card">
+        <p>Total Transaksi</p>
+        <h2>{{ \App\Models\Transaction::count() }}</h2>
+        <small style="color:#2563eb">↑ Semua waktu</small>
+    </div>
+    <div class="card">
+        <p>Total Pendapatan</p>
+        <h2>Rp 0</h2>
+        <small style="color:#2563eb">↑ Semua waktu</small>
+    </div>
+</div>
+
+<div class="table-container" style="margin-top:30px">
+    <h3 style="margin-bottom:15px">User Terbaru</h3>
+    <table>
+        <tr>
+            <th>Nama</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+        </tr>
+        @foreach(\App\Models\User::latest()->take(5)->get() as $user)
+        <tr>
+            <td>{{ $user->name }}</td>
+            <td>{{ $user->email }}</td>
+            <td>{{ ucfirst($user->role) }}</td>
+            <td>
+                <span class="badge {{ $user->status === 'aktif' ? 'badge-aktif' : 'badge-nonaktif' }}">
+                    {{ ucfirst($user->status) }}
+                </span>
+            </td>
+        </tr>
+        @endforeach
+    </table>
+</div>
+
+@endsection
