@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
 
 class CheckoutController extends Controller
 {
@@ -17,7 +19,7 @@ class CheckoutController extends Controller
 
         $subtotal = 0;
         foreach ($cart as $item) {
-            $subtotal += $item['price'] * $item['qty']; // FIX: pakai 'qty' bukan 'quantity'
+            $subtotal += $item['price'] * $item['qty'];
         }
 
         $ongkir     = 20000;
@@ -38,25 +40,34 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong.');
         }
 
-        $subtotal = 0;
+        $subtotal   = 0;
         foreach ($cart as $item) {
-            $subtotal += $item['price'] * $item['qty']; // FIX: pakai 'qty' bukan 'quantity'
+            $subtotal += $item['price'] * $item['qty'];
         }
 
         $ongkir     = 20000;
         $grandTotal = $subtotal + $ongkir;
 
-        session([
-            'last_order' => [
-                'order_number'   => 'OPH-' . date('Y') . '-' . strtoupper(Str::random(6)),
-                'payment_method' => $request->payment_method,
-                'phone_number'   => $request->phone_number ?? null,
-                'cart'           => $cart,
-                'subtotal'       => $subtotal,
-                'ongkir'         => $ongkir,
-                'grand_total'    => $grandTotal,
-            ]
+        // ✅ Simpan ke database
+        $order = Order::create([
+            'user_id'        => Auth::id(),
+            'order_number'   => 'OPH-' . date('Y') . '-' . strtoupper(Str::random(6)),
+            'payment_method' => $request->payment_method,
+            'subtotal'       => $subtotal,
+            'ongkir'         => $ongkir,
+            'grand_total'    => $grandTotal,
+            'status'         => 'pending',
         ]);
+
+        // ✅ Simpan juga ke session untuk halaman sukses
+        session(['last_order' => [
+            'order_number'   => $order->order_number,
+            'payment_method' => $order->payment_method,
+            'cart'           => $cart,
+            'subtotal'       => $subtotal,
+            'ongkir'         => $ongkir,
+            'grand_total'    => $grandTotal,
+        ]]);
 
         session()->forget('cart');
 

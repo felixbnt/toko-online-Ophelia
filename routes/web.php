@@ -6,6 +6,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,8 +56,7 @@ Route::get('/about', fn() => view('about'))->name('about');
 |--------------------------------------------------------------------------
 */
 Route::get('/search', function () {
-    $query = request('q');
-
+    $query    = request('q');
     $products = collect();
 
     foreach (getAllProducts() as $category => $items) {
@@ -67,10 +67,7 @@ Route::get('/search', function () {
         }
     }
 
-    return view('search', [
-        'results' => $products,
-        'query'   => $query,
-    ]);
+    return view('search', ['results' => $products, 'query' => $query]);
 })->name('search');
 
 /*
@@ -85,14 +82,11 @@ Route::get('/kids',  fn() => view('kids',  ['products' => getAllProducts()['kids
 Route::get('/product/{category}/{id}', function ($category, $id) {
     $all = getAllProducts();
 
-    if (!isset($all[$category][$id])) {
-        abort(404);
-    }
+    if (!isset($all[$category][$id])) abort(404);
 
     $related = collect($all[$category])
         ->filter(fn($p) => $p['id'] !== (int)$id)
-        ->take(3)
-        ->values();
+        ->take(3)->values();
 
     return view('product.detail', [
         'product' => $all[$category][$id],
@@ -126,12 +120,12 @@ Route::post('/register', [AuthController::class, 'register'])    ->name('registe
 | USER (butuh login)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('/logout',           [AuthController::class,    'logout'])  ->name('logout');
-    Route::get('/dashboard',         [AuthController::class,    'dashboard'])->name('dashboard');
-    Route::get('/checkout',          [CheckoutController::class,'index'])   ->name('checkout.index');
-    Route::post('/checkout/process', [CheckoutController::class,'process']) ->name('checkout.process');
-    Route::get('/checkout/success',  [CheckoutController::class,'success']) ->name('checkout.success');
+    Route::get('/dashboard',         [DashboardController::class, 'index']) ->name('dashboard');
+    Route::get('/checkout',          [CheckoutController::class, 'index'])  ->name('checkout.index');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout/success',  [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
 /*
@@ -139,15 +133,15 @@ Route::middleware('auth')->group(function () {
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/dashboard',        [AdminController::class, 'dashboard'])        ->name('admin.dashboard');
-    Route::get('/products',         [AdminController::class, 'products'])         ->name('admin.products');
-    Route::post('/products',        [AdminController::class, 'store'])            ->name('admin.products.store');
-    Route::put('/products/{id}',    [AdminController::class, 'update'])           ->name('admin.products.update');
-    Route::delete('/products/{id}', [AdminController::class, 'destroy'])          ->name('admin.products.destroy');
-    Route::get('/orders',           [AdminController::class, 'orders'])           ->name('admin.orders');
-    Route::post('/orders/{id}/status',[AdminController::class,'updateOrderStatus'])->name('admin.orders.status');
-    Route::get('/reports',          [AdminController::class, 'reports'])          ->name('admin.reports');
+Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
+    Route::get('/dashboard',          [AdminController::class, 'dashboard'])       ->name('admin.dashboard');
+    Route::get('/products',           [AdminController::class, 'products'])        ->name('admin.products');
+    Route::post('/products',          [AdminController::class, 'store'])           ->name('admin.products.store');
+    Route::put('/products/{id}',      [AdminController::class, 'update'])          ->name('admin.products.update');
+    Route::delete('/products/{id}',   [AdminController::class, 'destroy'])         ->name('admin.products.destroy');
+    Route::get('/orders',             [AdminController::class, 'orders'])          ->name('admin.orders');
+    Route::post('/orders/{id}/status',[AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
+    Route::get('/reports',            [AdminController::class, 'reports'])         ->name('admin.reports');
 });
 
 /*
@@ -155,21 +149,16 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 | SUPER ADMIN
 |--------------------------------------------------------------------------
 */
-Route::prefix('superadmin')->middleware('auth')->group(function () {
-    Route::get('/dashboard',    [SuperAdminController::class, 'dashboard'])   ->name('superadmin.dashboard');
-
-    // ── KELOLA ADMIN ──
-    Route::get('/admins',                [SuperAdminController::class, 'admins'])       ->name('superadmin.admins');
-    Route::post('/admins',               [SuperAdminController::class, 'storeAdmin'])   ->name('superadmin.admins.store');
-    Route::put('/admins/{id}',           [SuperAdminController::class, 'updateAdmin'])  ->name('superadmin.admins.update');
-    Route::delete('/admins/{id}',        [SuperAdminController::class, 'destroyAdmin']) ->name('superadmin.admins.destroy');
-
-    // ── KELOLA USER ──
-    Route::get('/users',          [SuperAdminController::class, 'users'])       ->name('superadmin.users');
-    Route::put('/users/{id}',     [SuperAdminController::class, 'updateUser'])  ->name('superadmin.users.update');
-    Route::delete('/users/{id}',  [SuperAdminController::class, 'destroyUser']) ->name('superadmin.users.destroy');
-
-    Route::get('/transactions', [SuperAdminController::class, 'transactions'])->name('superadmin.transactions');
-    Route::get('/reports',      [SuperAdminController::class, 'reports'])     ->name('superadmin.reports');
-    Route::get('/auditlog',     [SuperAdminController::class, 'auditlog'])    ->name('superadmin.auditlog');
+Route::prefix('superadmin')->middleware(['auth', 'isSuperAdmin'])->group(function () {
+    Route::get('/dashboard',         [SuperAdminController::class, 'dashboard'])    ->name('superadmin.dashboard');
+    Route::get('/admins',            [SuperAdminController::class, 'admins'])       ->name('superadmin.admins');
+    Route::post('/admins',           [SuperAdminController::class, 'storeAdmin'])   ->name('superadmin.admins.store');
+    Route::put('/admins/{id}',       [SuperAdminController::class, 'updateAdmin'])  ->name('superadmin.admins.update');
+    Route::delete('/admins/{id}',    [SuperAdminController::class, 'destroyAdmin']) ->name('superadmin.admins.destroy');
+    Route::get('/users',             [SuperAdminController::class, 'users'])        ->name('superadmin.users');
+    Route::put('/users/{id}',        [SuperAdminController::class, 'updateUser'])   ->name('superadmin.users.update');
+    Route::delete('/users/{id}',     [SuperAdminController::class, 'destroyUser'])  ->name('superadmin.users.destroy');
+    Route::get('/transactions',      [SuperAdminController::class, 'transactions']) ->name('superadmin.transactions');
+    Route::get('/reports',           [SuperAdminController::class, 'reports'])      ->name('superadmin.reports');
+    Route::get('/auditlog',          [SuperAdminController::class, 'auditlog'])     ->name('superadmin.auditlog');
 });

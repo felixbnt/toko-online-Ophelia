@@ -13,13 +13,11 @@ class AuthController extends Controller
     // REGISTER
     // ========================
 
-    // Tampilkan halaman register
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    // Proses register
     public function register(Request $request)
     {
         $request->validate([
@@ -43,13 +41,11 @@ class AuthController extends Controller
     // LOGIN
     // ========================
 
-    // Tampilkan halaman login
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    // Proses login
     public function login(Request $request)
     {
         $request->validate([
@@ -57,10 +53,22 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Login pakai kolom 'name' karena register simpan username ke 'name'
-        if (Auth::attempt(['name' => $request->username, 'password' => $request->password])) {
+        // Bisa login pakai email atau username
+        $loginField = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+
+        if (Auth::attempt([$loginField => $request->username, 'password' => $request->password])) {
             $request->session()->regenerate();
-            return redirect()->route('dashboard')->with('success', 'Login berhasil!');
+
+            // Redirect sesuai role
+            $role = Auth::user()->role;
+
+            if ($role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($role === 'superadmin') {
+                return redirect()->route('superadmin.dashboard');
+            }
+
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors([

@@ -121,7 +121,20 @@ public function destroyUser($id)
     */
     public function transactions()
     {
-        return view('superadmin.transactions');
+    $orders = \App\Models\Order::with('user')->latest()->get();
+
+    $totalTransaksi  = $orders->count();
+    $totalPendapatan = $orders->where('status', 'completed')->sum('grand_total');
+    $totalPending    = $orders->where('status', 'pending')->count();
+    $totalSelesai    = $orders->where('status', 'completed')->count();
+
+    return view('superadmin.transactions', compact(
+        'orders',
+        'totalTransaksi',
+        'totalPendapatan',
+        'totalPending',
+        'totalSelesai'
+    ));
     }
 
     public function systems()

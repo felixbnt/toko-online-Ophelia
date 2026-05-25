@@ -15,19 +15,23 @@
             <th>User</th>
             <th>Total</th>
             <th>Status</th>
+            <th>Tanggal</th>
         </tr>
+        @forelse($orders as $order)
         <tr>
-            <td>TRX001</td>
-            <td>Zaki</td>
-            <td>Rp 599.000</td>
-            <td>Berhasil</td>
+            <td>{{ $order->order_number }}</td>
+            <td>{{ $order->user->name ?? 'Pelanggan' }}</td>
+            <td>Rp {{ number_format($order->grand_total, 0, ',', '.') }}</td>
+            <td>{{ ucfirst($order->status) }}</td>
+            <td>{{ $order->created_at->format('d M Y') }}</td>
         </tr>
+        @empty
         <tr>
-            <td>TRX002</td>
-            <td>Ahmad</td>
-            <td>Rp 799.000</td>
-            <td>Pending</td>
+            <td colspan="5" style="text-align:center; color:#9ca3af; padding:1rem">
+                Belum ada transaksi.
+            </td>
         </tr>
+        @endforelse
     </table>
 </div>
 

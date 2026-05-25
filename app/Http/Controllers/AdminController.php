@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class AdminController extends Controller
 {
@@ -15,31 +16,28 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalProducts = DB::table('products')->count();
-        $totalOrders   = 0;   // aktifkan setelah tabel orders ada
+        $totalOrders   = Order::count();
         $totalUsers    = DB::table('users')->where('role', 'user')->count();
-        $totalRevenue  = 0;   // aktifkan setelah tabel orders ada
+        $totalRevenue  = Order::where('status', 'completed')->sum('grand_total');
 
-        // TODO: aktifkan setelah ada tabel orders
-        // $totalOrders  = DB::table('orders')->count();
-        // $totalRevenue = DB::table('orders')->where('status','completed')->sum('total');
-        // $recentOrders = DB::table('orders')
-        //                   ->join('users','orders.user_id','=','users.id')
-        //                   ->select('orders.*','users.name as name')
-        //                   ->latest('orders.created_at')->take(5)->get()
-        //                   ->map(fn($o) => [
-        //                       'id'     => $o->id,
-        //                       'name'   => $o->name,
-        //                       'total'  => $o->total,
-        //                       'status' => $o->status,
-        //                   ]);
+        $recentOrders = Order::with('user')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn($o) => [
+                'id'     => $o->id,
+                'name'   => $o->user->name ?? 'Pelanggan',
+                'total'  => $o->grand_total,
+                'status' => $o->status,
+            ]);
 
         return view('admin.dashboard', [
             'totalProducts' => $totalProducts,
             'totalOrders'   => $totalOrders,
             'totalUsers'    => $totalUsers,
             'totalRevenue'  => $totalRevenue,
-            'recentOrders'  => null,   // null → blade pakai demo data bawaan
-            'topProducts'   => null,   // null → blade pakai demo data bawaan
+            'recentOrders'  => $recentOrders,
+            'topProducts'   => null,
         ]);
     }
 
@@ -54,7 +52,6 @@ class AdminController extends Controller
         return view('admin.products', compact('products'));
     }
 
-    // CREATE
     public function store(Request $request)
     {
         $request->validate([
@@ -76,7 +73,6 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan');
     }
 
-    // UPDATE
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -97,7 +93,6 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Produk berhasil diupdate');
     }
 
-    // DELETE
     public function destroy($id)
     {
         DB::table('products')->where('id', $id)->delete();
@@ -111,12 +106,14 @@ class AdminController extends Controller
     */
     public function orders()
     {
+        $orders = Order::with('user')->latest()->get();
+
         return view('admin.orders', [
-            'orders'           => collect([]),
-            'totalOrders'      => 0,
-            'pendingOrders'    => 0,
-            'processingOrders' => 0,
-            'completedOrders'  => 0,
+            'orders'           => $orders,
+            'totalOrders'      => $orders->count(),
+            'pendingOrders'    => $orders->where('status', 'pending')->count(),
+            'processingOrders' => $orders->where('status', 'processing')->count(),
+            'completedOrders'  => $orders->where('status', 'completed')->count(),
         ]);
     }
 
@@ -125,6 +122,9 @@ class AdminController extends Controller
         $request->validate([
             'status' => 'required|in:pending,processing,completed,cancelled',
         ]);
+
+        // ✅ Simpan ke database
+        Order::where('id', $id)->update(['status' => $request->status]);
 
         return response()->json(['success' => true]);
     }
@@ -136,15 +136,19 @@ class AdminController extends Controller
     */
     public function reports(Request $request)
     {
-        $period    = (int) $request->get('period', 30);
-        $salesData = array_map(fn() => rand(200000, 1500000), range(0, 29));
+        $period      = (int) $request->get('period', 30);
+        $totalRevenue  = Order::where('status', 'completed')->sum('grand_total');
+        $totalOrders   = Order::count();
+        $totalCustomers = DB::table('users')->where('role', 'user')->count();
+        $avgOrderValue  = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
+        $salesData      = array_map(fn() => rand(200000, 1500000), range(0, 29));
 
         return view('admin.reports', [
             'period'         => $period,
-            'totalRevenue'   => 4093000,
-            'totalOrders'    => 24,
-            'totalCustomers' => 18,
-            'avgOrderValue'  => 170542,
+            'totalRevenue'   => $totalRevenue,
+            'totalOrders'    => $totalOrders,
+            'totalCustomers' => $totalCustomers,
+            'avgOrderValue'  => $avgOrderValue,
             'manPct'         => 45,
             'womanPct'       => 38,
             'kidsPct'        => 17,

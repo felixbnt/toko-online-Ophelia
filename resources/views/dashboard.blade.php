@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="dashboard-wrapper">
-    <head>
-    <link rel="stylesheet" href="{{ asset('css/dashboard.style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/dashboard.style.css') }}">
 
+<div class="dashboard-wrapper">
 
     {{-- Alert sukses --}}
     @if (session('success'))
@@ -29,7 +28,7 @@
     <div class="dash-stats">
         <div class="dash-stat-card">
             <span class="stat-label">🛍 Pesanan</span>
-            <span class="stat-value">0</span>
+            <span class="stat-value">{{ $jumlahPesanan }}</span>
         </div>
         <div class="dash-stat-card">
             <span class="stat-label">❤️ Wishlist</span>
@@ -43,7 +42,7 @@
 
     {{-- Menu Grid --}}
     <div class="dash-menu">
-        <a href="#" class="dash-menu-item">
+        <a href="#pesanan-saya" class="dash-menu-item">
             <div class="menu-icon blue">📦</div>
             <div>
                 <p class="menu-title">Pesanan saya</p>
@@ -73,6 +72,21 @@
         </a>
     </div>
 
+    {{-- List Pesanan --}}
+    <div class="dash-orders" id="pesanan-saya">
+        <h3>Pesanan Saya</h3>
+        @forelse($pesanan as $order)
+        <div class="dash-order-item">
+            <span class="order-number">#{{ $order->order_number }}</span>
+            <span class="order-date">{{ $order->created_at->format('d M Y') }}</span>
+            <span class="order-total">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
+            <span class="order-status {{ $order->status }}">{{ ucfirst($order->status) }}</span>
+        </div>
+        @empty
+        <p class="order-empty">Belum ada pesanan.</p>
+        @endforelse
+    </div>
+
     {{-- Tombol Logout --}}
     <form action="{{ route('logout') }}" method="POST">
         @csrf
@@ -80,7 +94,6 @@
             🚪 Logout dari akun
         </button>
     </form>
-    </head>
 
 </div>
 @endsection
