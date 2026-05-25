@@ -121,8 +121,7 @@ public function destroyUser($id)
     */
     public function transactions()
     {
-    $orders = \App\Models\Order::with('user')->latest()->get();
-
+    $orders = \App\Models\Order::with(['user', 'items'])->latest()->get();
     $totalTransaksi  = $orders->count();
     $totalPendapatan = $orders->where('status', 'completed')->sum('grand_total');
     $totalPending    = $orders->where('status', 'pending')->count();

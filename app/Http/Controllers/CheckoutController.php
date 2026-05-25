@@ -40,7 +40,7 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong.');
         }
 
-        $subtotal   = 0;
+        $subtotal = 0;
         foreach ($cart as $item) {
             $subtotal += $item['price'] * $item['qty'];
         }
@@ -48,7 +48,7 @@ class CheckoutController extends Controller
         $ongkir     = 20000;
         $grandTotal = $subtotal + $ongkir;
 
-        // ✅ Simpan ke database
+        // Simpan order
         $order = Order::create([
             'user_id'        => Auth::id(),
             'order_number'   => 'OPH-' . date('Y') . '-' . strtoupper(Str::random(6)),
@@ -59,7 +59,16 @@ class CheckoutController extends Controller
             'status'         => 'pending',
         ]);
 
-        // ✅ Simpan juga ke session untuk halaman sukses
+        // Simpan order items ← BARU
+        foreach ($cart as $item) {
+            $order->items()->create([
+                'product_id'   => $item['id'],
+                'product_name' => $item['name'],
+                'quantity'     => $item['qty'],
+                'price'        => $item['price'],
+            ]);
+        }
+
         session(['last_order' => [
             'order_number'   => $order->order_number,
             'payment_method' => $order->payment_method,
