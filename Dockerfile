@@ -1,19 +1,7 @@
-# Stage 1: Build frontend assets dengan Node.js
-FROM node:20-alpine AS build
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-# Stage 2: Image utama (PHP + nginx)
+# Image utama (PHP + nginx)
 FROM richarvey/nginx-php-fpm:3.1.6
 
 COPY . .
-
-# Copy hasil build asset dari stage 1
-COPY --from=build /app/public/build /var/www/html/public/build
 
 # Image config
 ENV SKIP_COMPOSER 1
