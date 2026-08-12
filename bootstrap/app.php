@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAdmin'      => \App\Http\Middleware\IsAdmin::class,
             'isSuperAdmin' => \App\Http\Middleware\IsSuperAdmin::class,
         ]);
+
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
